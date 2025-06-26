@@ -1,7 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { assets, cities } from '../assets/assets'
+import { useAppContext } from '../context/appContext'
 
 const Hero = () => {
+
+    const {navigate, getToken, axios, setSearchedCities } = useAppContext()
+    const [destination, setdestination] = useState("")
+
+    const onSearch = async (e)=>{
+        const token = await getToken();
+        e.preventDefault();
+        navigate(`/rooms?destination=${destination}`)
+        await axios.post('/api/user/store-recent-search', {recentSearchedCity: destination}, {headers: {Authorization: `Bearer ${token}`}})
+
+        setSearchedCities((prev)=>{
+            const updatedSearchedCities = [...prev, destination];
+
+            if(updatedSearchedCities.length > 3){
+                updatedSearchedCities.shift();
+            }
+            return updatedSearchedCities;
+        })
+    }
+
     return (
         <div className='flex flex-col items-start justify-center px-6 md:px-16 lg:px-24 xl:px-32 text-white bg-[url("/src/assets/heroImage.png")] bg-no-repeat bg-cover bg-center h-screen'>
             <p className='bg-[#49b9ff]/50 px-3.5 py-1 rounded-full mt-20'>The Ultimate Hotel Experience</p>
@@ -10,14 +31,14 @@ const Hero = () => {
 
             <p className='max-w-130 mt-2 text-sm md:text-base'>Unparalleled luxury and comform await at thw world's most exclusive hotels and resorts. Start your journey today!</p>
 
-            <form className='bg-white text-gray-500 rounded-lg px-6 py-4 mt-8 flex flex-col md:flex-row max-md:items-start gap-4 max-md:mx-auto'>
+            <form onSubmit={onSearch} className='bg-white text-gray-500 rounded-lg px-6 py-4 mt-8 flex flex-col md:flex-row max-md:items-start gap-4 max-md:mx-auto'>
 
                 <div>
                     <div className='flex items-center gap-2'>
                         <img src={assets.calenderIcon} alt="" className='h-4'/>
                         <label htmlFor="destinationInput">Destination</label>
                     </div>
-                    <input list='destinations' id="destinationInput" type="text" className=" rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none" placeholder="Type here" required />
+                    <input onChange={e => setdestination(e.target.value)} value={destination} list='destinations' id="destinationInput" type="text" className=" rounded border border-gray-200 px-3 py-1.5 mt-1.5 text-sm outline-none" placeholder="Type here" required />
                     <datalist id='destinations'>
                         {cities.map((city, index)=>(
                             <option value={city} key={index} />
