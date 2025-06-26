@@ -6,7 +6,6 @@ import { useAppContext } from '../context/appContext'
 import toast from 'react-hot-toast'
 
 const RoomDetails = () => {
-
     const { id } = useParams()
     const { rooms, getToken, axios, navigate } = useAppContext();
     const [room, setroom] = useState(null)
