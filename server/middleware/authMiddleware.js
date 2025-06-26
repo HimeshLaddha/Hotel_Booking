@@ -1,16 +1,37 @@
-import { getAuth } from "@clerk/express"; // ✅ import this
+import { getAuth } from "@clerk/express";
 import User from "../models/User.js";
+import { clerkClient } from "@clerk/clerk-sdk-node"; // make sure this is installed & configured
 
-// Middleware to check user Authentication
 export const protect = async (req, res, next) => {
-    const auth = getAuth(req); // ✅ new and correct way to get user info
+    const auth = getAuth(req);
+
     if (!auth.userId) {
-        return res.json({ success: false, message: "Not Authorized" });
+        return res.status(401).json({ success: false, message: "Not Authorized" });
     }
 
-    const user = await User.findById(auth.userId);
-    req.user = user;
-    req.auth = auth; // Optional: attach auth to req if needed in controllers
+    try {
+        let user = await User.findById(auth.userId);
 
-    next();
+        if (!user) {
+            // fetch user from Clerk
+            const clerkUser = await clerkClient.users.getUser(auth.userId);
+
+            user = await User.create({
+                _id: clerkUser.id, // Clerk user ID as _id
+                username: clerkUser.username || clerkUser.firstName || "Guest",
+                email: clerkUser.emailAddresses[0].emailAddress,
+                image: clerkUser.imageUrl,
+                role: "user",
+                recentSearchedCities: [],
+            });
+        }
+
+        req.user = user;
+        req.auth = auth;
+        next();
+
+    } catch (err) {
+        console.error("Auth Middleware Error:", err.message);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
 };
