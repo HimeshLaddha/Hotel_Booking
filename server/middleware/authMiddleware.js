@@ -4,8 +4,6 @@ import { clerkClient } from "@clerk/clerk-sdk-node"; // make sure this is instal
 
 export const protect = async (req, res, next) => {
     const auth = getAuth(req);
-    console.log("🔍 AUTH HEADERS:", req.headers.authorization);
-    console.log("🧠 Clerk getAuth output:", auth);
 
     if (!auth.userId) {
         return res.status(401).json({ success: false, message: "Not Authorized" });
