@@ -18,7 +18,10 @@ app.use(cors())
 
 // Middleware
 app.use(express.json())
-app.use(clerkMiddleware())
+app.use(clerkMiddleware({
+  secretKey: process.env.CLERK_SECRET_KEY,
+  publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+}));
 
 app.use("/api/clerk", clerkWebhooks);
 
