@@ -4,12 +4,12 @@ import Room from "../models/Room.js";
 import Stripe from "stripe";
 
 // Function to check availability of room
-const checkAvailability = async ({ checkInDate, checkOutDate, room }) => {
+const checkAvailability = async ({ CheckInDate, CheckOutDate, room }) => {
     try {
         const bookings = await Booking.find({
             room,
-            checkInDate: { $lte: checkOutDate },
-            checkOutDate: { $gte: checkInDate },
+            checkInDate: { $lte: CheckOutDate },
+            checkOutDate: { $gte: CheckInDate },
         });
 
         const isAvailable = bookings.length === 0;
