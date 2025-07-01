@@ -6,7 +6,7 @@ QuickStay is a full-stack hotel booking platform where users can discover and bo
 
 ## 🌐 Live Demo
 
-🔗 [Visit QuickStay](https://your-live-url.com)
+🔗 [Visit QuickStay](https://hotel-booking-frontend-pink-delta.vercel.app/)
 
 ---
 
